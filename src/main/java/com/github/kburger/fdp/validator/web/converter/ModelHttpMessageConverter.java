@@ -25,10 +25,13 @@ package com.github.kburger.fdp.validator.web.converter;
 
 import java.io.IOException;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.vocabulary.SHACL;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.WriterConfig;
+import org.eclipse.rdf4j.rio.helpers.BasicWriterSettings;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -37,6 +40,13 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 public class ModelHttpMessageConverter extends AbstractHttpMessageConverter<Model> {
+    private static final WriterConfig DEFAULT_CONFIG;
+    
+    static {
+        DEFAULT_CONFIG = new WriterConfig()
+                .set(BasicWriterSettings.INLINE_BLANK_NODES, true);
+    }
+    
     private final RDFFormat format;
 
     public ModelHttpMessageConverter(RDFFormat format) {
@@ -62,8 +72,10 @@ public class ModelHttpMessageConverter extends AbstractHttpMessageConverter<Mode
     @Override
     protected void writeInternal(Model model, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
+        model.setNamespace(SHACL.NS);
+        
         try {
-            Rio.write(model, outputMessage.getBody(), format);
+            Rio.write(model, outputMessage.getBody(), format, DEFAULT_CONFIG);
         } catch (RDFHandlerException e) {
             throw new HttpMessageNotWritableException(e.getMessage());
         }

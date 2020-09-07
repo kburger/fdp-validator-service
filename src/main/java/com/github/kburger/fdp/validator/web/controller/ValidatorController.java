@@ -23,18 +23,23 @@
  */
 package com.github.kburger.fdp.validator.web.controller;
 
+import java.io.IOException;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.impl.DynamicModelFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.github.kburger.fdp.validator.service.ValidatorService;
 
 @RestController
 @RequestMapping("${validator.endpoint.path:/validate}")
 public class ValidatorController {
+    @Autowired
+    private ValidatorService service;
+    
     @GetMapping
-    public Model validate(@RequestParam String resource) {
-        return new DynamicModelFactory().createEmptyModel();
+    public Model validate(@RequestParam String resource) throws IOException {
+        return service.validate(resource);
     }
 }
