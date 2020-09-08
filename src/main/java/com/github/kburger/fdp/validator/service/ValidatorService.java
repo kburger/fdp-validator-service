@@ -115,6 +115,9 @@ public class ValidatorService {
             connection.add(shacl, RDF4J.SHACL_SHAPE_GRAPH);
             
             connection.commit();
+        } catch (RepositoryException e) {
+            // shouldn't happen
+            // TODO handle properly
         }
         
         // validate
